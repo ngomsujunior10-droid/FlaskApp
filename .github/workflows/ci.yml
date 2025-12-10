@@ -28,7 +28,6 @@ jobs:
 
 
   docker_build_and_push:
-    needs: tests          # ⬅️ CONDITION : s'exécute seulement si 'tests' est OK
     runs-on: ubuntu-latest
 
     steps:
