@@ -47,3 +47,36 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/flaskapp:latest
+        tests:
+  runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest
+
+      - name: Send email on test failure
+        if: failure()        # ⬅️ Étape exécutée uniquement si les tests échouent
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "CI Pipeline - Tests Failed"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: "CI Pipeline <no-reply@example.com>"
+          body: |
+            Les tests du pipeline CI ont échoué.
+            Veuillez vérifier les logs sur GitHub Actions.
+
